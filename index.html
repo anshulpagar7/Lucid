@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#F5F0E6" />
+    <title>Lucid — Attention, Engagement & Cognitive Load</title>
+    <link rel="icon" href="/favicon.svg" />
+    <script>
+      // paint the saved theme's background before the app loads (no light flash on dark themes)
+      try {
+        var bg = { night: "#0f1013", crimson: "#0c1430", storm: "#111720", ember: "#13100e", speedway: "#f7eee1" }[localStorage.getItem("lucid.theme")];
+        if (bg) document.documentElement.style.background = bg;
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
