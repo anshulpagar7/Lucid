@@ -1,0 +1,409 @@
+@import "tailwindcss";
+
+/* ───────── Lucid — "instrument on paper" ─────────
+   Cream paper, warm ink, three pen inks (attention / engagement / load) like a
+   chart recorder. The camera lives in a dark viewfinder; everything else is paper. */
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Newsreader Variable", "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* paper */
+  --color-bg: #f5f0e6;
+  --color-panel: #fcfaf5;
+  --color-panel-2: #f1ebdf;
+  --color-line: #e5ddcd;
+  --color-line-2: #d3c7b2;
+  --color-grid: #ece5d6;
+  /* ink */
+  --color-fg: #1e1b16;
+  --color-muted: #6a6155;
+  --color-faint: #9c9282;
+  --color-accent: #1e1b16;
+  --color-accent-fg: #fcfaf5;
+
+  /* pen inks — validated on #FCFAF5: lightness band, chroma, CVD, contrast */
+  --color-att: #0083a3;
+  --color-eng: #5a45b0;
+  --color-load: #b5730a;
+  --color-pulse: #c23a4f;
+  --color-ok: #2f7d4f;
+  --color-bad: #b42318;
+
+  /* the viewfinder (camera surfaces) */
+  --color-screen: #191714;
+  --color-screen-2: #24211c;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* paper tooth: a very faint fibre noise, no colour washes */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.4  0 0 0 0 0.33  0 0 0 0 0.22  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-att) 22%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-att);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* headings set in the serif */
+h1,
+h2,
+.serif {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+}
+h1 {
+  font-weight: 500;
+}
+h2 {
+  font-weight: 500;
+}
+
+.panel {
+  position: relative;
+  background: var(--color-panel);
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+}
+
+/* small headings inside panels: sentence case, never shouty */
+.label {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-muted);
+}
+
+.num {
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 15px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  border: 1px solid var(--color-line-2);
+  background: var(--color-panel);
+  color: var(--color-fg);
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.08s;
+}
+.btn:hover:not(:disabled) {
+  background: var(--color-panel-2);
+  border-color: var(--color-faint);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+  border-color: var(--color-accent);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  filter: brightness(1.1);
+}
+
+/* dark viewfinder for camera feeds */
+.screen {
+  background: var(--color-screen);
+  color: #f1ebdf;
+}
+
+/* one shadow token, only for things that float above the page */
+.float {
+  box-shadow: 0 1px 2px rgb(30 27 22 / 0.06), 0 12px 32px -8px rgb(30 27 22 / 0.18);
+}
+
+.pulse-dot {
+  animation: pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.fade-in {
+  animation: fadeIn 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* heart: pops on every detected beat (triggered from JS) */
+.beat {
+  animation: beat 0.42s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+@keyframes beat {
+  0% { transform: scale(1); }
+  18% { transform: scale(1.22); }
+  40% { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+/* gaze calibration target */
+@keyframes calShrink {
+  from { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(0.35); opacity: 1; }
+}
+
+/* ───────── page transitions (View Transitions API) ───────── */
+::view-transition-old(root) {
+  animation: vtOut 0.18s cubic-bezier(0.4, 0, 1, 1) both;
+}
+::view-transition-new(root) {
+  animation: vtIn 0.34s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes vtOut {
+  to { opacity: 0; transform: translateY(-4px); }
+}
+@keyframes vtIn {
+  from { opacity: 0; transform: translateY(8px); }
+}
+/* the nav indicator glides between tabs */
+::view-transition-group(nav-pill) {
+  animation-duration: 0.34s;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+/* keep the header steady while the page changes underneath */
+::view-transition-old(topbar),
+::view-transition-new(topbar) {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  .fade-in,
+  .pulse-dot,
+  .beat,
+  .ambient::before,
+  .ambient::after {
+    animation: none !important;
+  }
+}
+
+/* ───────── themes ─────────
+   Colours and the heading face come from src/theme.ts. Here: heading weights and
+   one quiet ambient effect per theme, kept behind the panels. */
+html[data-mode="dark"] body::after {
+  mix-blend-mode: soft-light;
+  opacity: 0.1;
+}
+html[data-mode="dark"] .btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08) saturate(1.05);
+}
+:root[data-theme="night"] :is(h1, h2, .font-serif) { font-weight: 500; letter-spacing: 0; }
+:root[data-theme="crimson"] :is(h1, h2, .font-serif) { font-weight: 700; font-style: italic; letter-spacing: 0; }
+:root[data-theme="storm"] :is(h1, h2, .font-serif) { font-weight: 600; letter-spacing: 0.01em; }
+:root[data-theme="ember"] :is(h1, h2, .font-serif) { font-weight: 800; letter-spacing: 0.005em; }
+:root[data-theme="speedway"] :is(h1, h2, .font-serif) { font-weight: 400; letter-spacing: -0.01em; }
+
+.ambient,
+.ambient::before,
+.ambient::after {
+  position: fixed;
+  pointer-events: none;
+}
+.ambient {
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+.ambient::before,
+.ambient::after {
+  content: "";
+}
+
+/* Nightwatch: a searchlight beam sweeping slowly from below the horizon */
+[data-theme="night"] .ambient::before {
+  left: 50%;
+  bottom: -30vh;
+  width: 0;
+  height: 0;
+  border-left: 18vw solid transparent;
+  border-right: 18vw solid transparent;
+  border-top: 170vh solid rgb(242 194 48 / 0.045);
+  transform-origin: 50% 100%;
+  translate: -50% 0;
+  filter: blur(18px);
+  animation: sweep 22s ease-in-out infinite alternate;
+}
+[data-theme="night"] .ambient::after {
+  inset: 0;
+  background: radial-gradient(ellipse 60% 40% at 50% 0%, rgb(242 194 48 / 0.05), transparent 70%);
+}
+@keyframes sweep {
+  from { rotate: -28deg; }
+  to { rotate: 28deg; }
+}
+
+/* Crimson: comic halftone in red top-right, blue bottom-left */
+[data-theme="crimson"] .ambient::before {
+  inset: 0;
+  background: radial-gradient(circle, rgb(232 51 58 / 0.32) 1.3px, transparent 1.8px) 0 0 / 13px 13px;
+  mask-image: radial-gradient(ellipse 55% 60% at 100% 0%, #000, transparent 75%);
+}
+[data-theme="crimson"] .ambient::after {
+  left: 0;
+  top: 64px;
+  width: 420px;
+  height: 420px;
+  opacity: 0.13;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='420' height='420'><path d='M0 0L420 0M0 0L411 87M0 0L384 171M0 0L340 247M0 0L281 312M0 0L210 364M0 0L130 399M0 0L44 418M76 0Q65 7 74 16M74 16Q62 20 69 31M69 31Q56 33 61 44M61 44Q48 44 51 56M51 56Q38 53 38 65M38 65Q26 59 23 72M23 72Q14 64 8 75M134 0Q115 12 131 28M131 28Q110 36 123 55M123 55Q100 58 109 79M109 79Q86 77 90 100M90 100Q68 94 67 116M67 116Q47 106 42 128M42 128Q24 113 14 134M197 0Q169 18 193 41M193 41Q161 52 180 80M180 80Q147 85 160 116M160 116Q126 114 132 147M132 147Q100 137 99 171M99 171Q69 155 61 188M61 188Q35 166 21 196M265 0Q226 24 259 55M259 55Q216 70 242 108M242 108Q197 114 214 156M214 156Q169 152 177 197M177 197Q134 184 132 229M132 229Q93 208 82 252M82 252Q47 223 28 263M336 0Q287 30 329 70M329 70Q275 89 307 137M307 137Q250 144 272 197M272 197Q215 193 225 250M225 250Q170 234 168 291M168 291Q118 264 104 320M104 320Q60 283 35 334M407 0Q348 37 398 85M398 85Q333 108 372 166M372 166Q303 175 330 239M330 239Q260 234 273 303M273 303Q206 283 204 353M204 353Q143 320 126 387M126 387Q73 343 43 405' fill='none' stroke='%23f3f1f5' stroke-width='1.1'/></svg>") no-repeat;
+  mask-image: radial-gradient(circle at 0 0, #000 40%, transparent 100%);
+}
+
+/* Storm: cloud bank overhead, and a distant flash every so often */
+[data-theme="storm"] .ambient::before {
+  inset: 0;
+  background:
+    radial-gradient(ellipse 50% 30% at 20% 0%, rgb(143 211 255 / 0.07), transparent 70%),
+    radial-gradient(ellipse 45% 25% at 80% 0%, rgb(179 161 255 / 0.06), transparent 70%);
+}
+
+
+/* Ember: sparks drifting up from a glow below the page */
+[data-theme="ember"] .ambient::before {
+  inset: 0;
+  background: radial-gradient(ellipse 70% 35% at 50% 110%, rgb(255 106 43 / 0.14), transparent 70%);
+}
+[data-theme="ember"] .ambient::after {
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(100vh + 480px);
+  background-image:
+    radial-gradient(2px 2px at 8% 20%, rgb(255 138 61 / 0.7), transparent),
+    radial-gradient(1.5px 1.5px at 27% 62%, rgb(255 181 71 / 0.6), transparent),
+    radial-gradient(2px 2px at 46% 35%, rgb(255 106 43 / 0.55), transparent),
+    radial-gradient(1.5px 1.5px at 64% 80%, rgb(255 181 71 / 0.5), transparent),
+    radial-gradient(2px 2px at 83% 12%, rgb(255 138 61 / 0.6), transparent),
+    radial-gradient(1px 1px at 92% 55%, rgb(255 200 120 / 0.6), transparent);
+  background-size: 520px 480px;
+  mask-image: linear-gradient(to top, #000 10%, transparent 85%);
+  animation: rise 26s linear infinite;
+}
+@keyframes rise {
+  from { transform: translateY(0); }
+  to { transform: translateY(-480px); }
+}
+
+/* Speedway: chequered corner and the odd streak across the page */
+[data-theme="speedway"] .ambient::before {
+  inset: 0;
+  background: conic-gradient(rgb(35 26 19 / 0.09) 25%, transparent 0 50%, rgb(35 26 19 / 0.09) 0 75%, transparent 0) 0 0 / 24px 24px;
+  mask-image: radial-gradient(ellipse 40% 45% at 100% 100%, #000, transparent 75%);
+}
+
+
+/* theme switch: the new theme spreads from the click in a circle */
+html[data-vt="theme"] .vt-topbar,
+html[data-vt="theme"] .vt-pill {
+  view-transition-name: none !important;
+}
+html[data-vt="theme"]::view-transition-old(root),
+html[data-vt="theme"]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html[data-vt="theme"]::view-transition-new(root) {
+  z-index: 1;
+}
+
+/* documents stay on paper in every theme (the printable report) */
+.force-paper {
+  --color-bg: #f5f0e6;
+  --color-panel: #fcfaf5;
+  --color-panel-2: #f1ebdf;
+  --color-line: #e5ddcd;
+  --color-line-2: #d3c7b2;
+  --color-grid: #ece5d6;
+  --color-fg: #1e1b16;
+  --color-muted: #6a6155;
+  --color-faint: #9c9282;
+  --color-accent: #1e1b16;
+  --color-accent-fg: #fcfaf5;
+  --color-att: #0083a3;
+  --color-eng: #5a45b0;
+  --color-load: #b5730a;
+  --color-pulse: #c23a4f;
+  --color-ok: #2f7d4f;
+  --color-bad: #b42318;
+  --font-serif: "Newsreader Variable", "Newsreader", Georgia, serif;
+  color: var(--color-fg);
+}
+.force-paper :is(h1, h2, .font-serif) {
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* uPlot */
+.uplot,
+.uplot * {
+  font-family: var(--font-sans) !important;
+}
+.u-legend {
+  display: none;
+}
+
+/* ───────── print: only the session report ───────── */
+@media print {
+  @page { size: A4; margin: 12mm; }
+  body.printing-report { background: #fff !important; }
+  body.printing-report::before,
+  body.printing-report::after,
+  body.printing-report > *:not(.print-root) { display: none !important; }
+  .print-root { position: static !important; overflow: visible !important; background: #fff !important; backdrop-filter: none !important; }
+  .print-root .no-print { display: none !important; }
+  .print-root .paper { margin: 0 !important; width: auto !important; max-width: none !important; padding: 0 !important; box-shadow: none !important; }
+  .avoid-break { break-inside: avoid; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
